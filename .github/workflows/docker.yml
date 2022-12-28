@@ -16,31 +16,27 @@ env:
   IMAGE_TAG: latest
 
 jobs:
-  build:
+  application:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        workdir: [., bin/pzzldbot]
-        image: [tldr, pzzldbot]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build the Docker image
-        run: docker buildx build --tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }} ${{ matrix.workdir }}
-  publish:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        dockerfile: [Dockerfile, bin/pzzldbot/Dockerfile]
-        image: [tldr, pzzldbot]
     steps:
     - uses: actions/checkout@v3
     - name: Publish to Registry
       uses: elgohr/Publish-Docker-Github-Action@v5
       with:
-        dockerfile: ${{ matrix.dockerfile }}
-        name: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}
+        dockerfile: Dockerfile
+        name: ${{ secrets.DOCKERHUB_USERNAME }}/tldr
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        snapshot: true
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+  service:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Publish to Registry
+      uses: elgohr/Publish-Docker-Github-Action@v5
+      with:
+        dockerfile: bin/pzzldbot/Dockerfile
+        name: ${{ secrets.DOCKERHUB_USERNAME }}/pzzldbot
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         snapshot: true
         username: ${{ secrets.DOCKERHUB_USERNAME }}

@@ -26,6 +26,7 @@ acme = { features = [], git = "https://github.com/FL03/acme", branch = "v0.2.4",
 scsys = { features = [], version = "0.1.38" }
 
 # App
+async-trait = "0.1.60"
 axum-core = "0.3.0"
 clap = { features = ["cargo", "derive", "env"], version = "4.0.32" }
 http = "0.2.8"

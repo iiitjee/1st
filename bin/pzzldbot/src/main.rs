@@ -73,7 +73,8 @@ impl Application {
         self.set_state(State::new(None, None, Some(States::Process)))
             .await?;
         // Fetch the initialized cli and process the results
-        services::TelegramBot::try_from_env(None)?.spawn().await?;
+        let bot_cnf = services::TelegramBotConfig::try_from_env(None)?;
+        services::TelegramBot::new(bot_cnf).spawn().await?;
         self.set_state(State::new(None, None, Some(States::Complete)))
             .await?;
         Ok(())

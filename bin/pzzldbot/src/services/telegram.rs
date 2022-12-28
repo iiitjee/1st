@@ -23,6 +23,16 @@ trait TelegramBotSpec {
     }
 }
 
+#[async_trait::async_trait]
+trait TelegramBotOperator {
+    fn client(&self) -> Bot where Self: Sized;
+    async fn spawn(&self) -> AsyncResult where Self: Sized {
+        Command::repl(self.client(), handler).await;
+        Ok(())
+    }
+}
+
+
 /// Defines the desired command structure for the bot
 #[derive(BotCommands, Clone, Debug, PartialEq)]
 #[command(rename_rule = "lowercase")]
@@ -57,13 +67,35 @@ async fn handler(bot: Bot, cmd: Command, msg: Message) -> ResponseResult<()> {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]
-pub struct TelegramBot {
+pub struct TelegramBotToken(String);
+
+impl TelegramBotToken {
+    pub fn new(token: Option<String>) -> Self {
+        Self(token.unwrap_or_default())
+    }
+    pub fn try_from_env(&mut self, token: Option<&str>) -> AsyncResult<&Self> {
+        self.0 = std::env::var(token.unwrap_or(DEFAULT_ENV_KEY))?;
+        Ok(self)
+    }
+}
+
+impl TryFrom<Option<&str>> for TelegramBotToken {
+    type Error = Box<dyn std::error::Error + Send + Sync>;
+
+    fn try_from(value: Option<&str>) -> Result<Self, Self::Error> {
+        let res = std::env::var(value.unwrap_or(DEFAULT_ENV_KEY))?;
+        Ok(Self::new(Some(res)))
+    }
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]
+pub struct TelegramBotConfig {
     pub name: String,
     token: String,
     pub username: String,
 }
 
-impl TelegramBot {
+impl TelegramBotConfig {
     pub fn new(name: String, token: String, username: String) -> Self {
         Self { name, token, username }
     }
@@ -75,15 +107,19 @@ impl TelegramBot {
         let token = std::env::var(token.unwrap_or(DEFAULT_ENV_KEY))?;
         Ok(Self::new(Default::default(), token, Default::default()))
     }
-    pub fn bot(&self) -> Bot {
-        Bot::new(self.token.clone())
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]
+pub struct TelegramBot {
+    pub cnf: TelegramBotConfig,
+}
+
+impl TelegramBot {
+    pub fn new(cnf: TelegramBotConfig) -> Self {
+        Self { cnf }
     }
-    pub async fn spawn_example(&self) -> AsyncResult {
-        teloxide::repl(self.bot(), |bot: Bot, msg: Message| async move {
-            bot.send_dice(msg.chat.id).await?;
-            Ok(())
-        }).await;
-        Ok(())
+    pub fn bot(&self) -> Bot {
+        Bot::new(self.cnf.token.clone())
     }
     pub async fn spawn(&self) -> AsyncResult {
         Command::repl(self.bot(), handler).await;
@@ -91,12 +127,29 @@ impl TelegramBot {
     }
 }
 
-impl TelegramBotSpec for TelegramBot {
+impl TelegramBotSpec for TelegramBotConfig {
     fn name(&self) -> String where Self: Sized {
         self.name.clone()
     }
 
     fn username(&self) -> String where Self: Sized {
         self.username.clone()
+    }
+}
+
+
+impl TelegramBotSpec for TelegramBot {
+    fn name(&self) -> String where Self: Sized {
+        self.cnf.name()
+    }
+
+    fn username(&self) -> String where Self: Sized {
+        self.cnf.username()
+    }
+}
+
+impl TelegramBotOperator for TelegramBot {
+    fn client(&self) -> Bot where Self:Sized {
+        Bot::new(self.cnf.token.clone())
     }
 }

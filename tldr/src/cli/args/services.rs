@@ -19,12 +19,9 @@ impl Services {
     }
     pub async fn handler(&self) -> AsyncResult<&Self> {
         tracing::debug!("System processing...");
-        let bot = crate::services::TelegramBot::from_env(None);
-        let abot = std::sync::Arc::new(bot);
+        
         if self.up {
-            tokio::spawn( async move {
-                abot.spawn().await.expect("Failed to spawn the telegram bot...");
-            });
+            crate::services::TelegramBot::try_from_env(None)?.spawn().await?;
         }
         Ok(self)
     }

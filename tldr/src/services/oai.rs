@@ -12,10 +12,11 @@ use openai::{
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
 
-pub fn chatgpt(prompt: &str) -> AsyncResult {
+pub async fn chatgpt(prompt: &str) -> AsyncResult {
     let oai = OpenAI::from_env(Some("OPENAI_SECRET_KEY"));
     let req = oai.create_request(prompt);
-    println!("{:?}", req);
+    let res = oai.response(req).await?;
+    println!("{:?}", res.choices);
     Ok(())
 }
 
@@ -59,18 +60,19 @@ impl OpenAI {
 }
 
 #[cfg(test)]
+#[cfg(feature = "test_env")]
 mod tests {
     use super::*;
 
     #[test]
     fn test_openai_default() {
-        let a = OpenAI::from_env(Some("OPENAI_SECRET_KEY"));
+        let a = OpenAI::from_env(Some("OPENAI_API_KEY"));
         assert!(a.is_auth())
     }
 
     #[tokio::test]
     async fn test_openai_completion() {
-        let oai = OpenAI::from_env(Some("OPENAI_SECRET_KEY"));
+        let oai = OpenAI::from_env(Some("OPENAI_API_KEY"));
         let req = oai.create_request("What is music theory?");
         let res = oai.response(req).await;
         assert!(res.is_ok())

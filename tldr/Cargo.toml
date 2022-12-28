@@ -10,6 +10,10 @@ name = "tldr"
 repository = "https://github.com/FL03/tldr"
 version = "0.1.0"
 
+[features]
+
+test_env = []
+
 [[bin]]
 bench = false
 name = "tldr"

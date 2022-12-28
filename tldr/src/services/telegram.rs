@@ -23,8 +23,19 @@ trait TelegramBotSpec {
     }
 }
 
-type Prompt = String;
+/// Defines the desired command structure for the bot
+#[derive(BotCommands, Clone, Debug, PartialEq)]
+#[command(rename_rule = "lowercase")]
+pub enum Command {
+    #[command(description = "Rolls a 6-sided die")]
+    Dice,
+    #[command(description = "display this text.")]
+    Help,
+    #[command(description = "Given a topic or url, return a concise summary")]
+    Query(String),
+}
 
+/// Handles the commands issued to the bot and returns a [ResponseResult]
 async fn handler(bot: Bot, cmd: Command, msg: Message) -> ResponseResult<()> {
     match cmd {
         Command::Dice => {
@@ -33,26 +44,16 @@ async fn handler(bot: Bot, cmd: Command, msg: Message) -> ResponseResult<()> {
         Command::Help => {
             bot.send_message(msg.chat.id, Command::descriptions().to_string()).await?;
         }
-        Command::Query(_, prompt) => {
-            let oai = crate::services::OpenAI::from_env(None);
+        Command::Query(prompt) => {
+            let oai = super::OpenAI::from_env(None);
             let req = oai.create_request(prompt.as_str());
-            let res = format!("{:?}", req);
-            bot.send_message(msg.chat.id, res).await?;
+            let res = oai.response(req).await.expect("");
+            let choices = res.choices.iter().map(|i| format!("{:?}", i.text.clone())).collect::<String>();
+            bot.send_message(msg.chat.id, choices).await?;
         },
     };
 
     Ok(())
-}
-
-#[derive(BotCommands, Clone, Debug, PartialEq)]
-#[command(rename_rule = "lowercase", parse_with = "split")]
-pub enum Command {
-    #[command(description = "Rolls a 6-sided die")]
-    Dice,
-    #[command(description = "display this text.")]
-    Help,
-    #[command(description = "Given a topic or url, return a concise summary")]
-    Query(String, String),
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]
@@ -97,16 +98,5 @@ impl TelegramBotSpec for TelegramBot {
 
     fn username(&self) -> String where Self: Sized {
         self.username.clone()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_default() {
-        let a = "";
-        assert!(a == "")
     }
 }

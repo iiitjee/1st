@@ -27,8 +27,7 @@ pub type TokioChannelPackMPSC<T> = (tokio::sync::mpsc::Sender<T>, tokio::sync::m
 
 #[tokio::main]
 async fn main() -> AsyncResult {
-    let bot = services::TelegramBot::try_from_env(None)?;
-    bot.spawn().await?;
+    // services::TelegramBot::try_from_env(None)?.spawn().await?;
 
     // Create an application instance
     let mut app = Application::default();

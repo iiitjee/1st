@@ -10,6 +10,11 @@ name = "pzzld-bot"
 repository = "https://github.com/FL03/tldr"
 version = "0.1.0"
 
+[[bin]]
+bench = false
+name = "pzzldbot"
+path = "src/main.rs"
+test = false
 
 [build-dependencies]
 
@@ -25,7 +30,7 @@ axum-core = "0.3.0"
 clap = { features = ["cargo", "derive", "env"], version = "4.0.32" }
 http = "0.2.8"
 hyper = { features = ["full"], version = "0.14.23" }
-tokio = { features = ["macros"], version = "1.23.0" }
+tokio = { features = ["full"], version = "1.23.0" }
 tower = "0.4.13"
 tower-http = { features = [], version = "0.3.5" }
 tracing = "0.1.37"

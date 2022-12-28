@@ -18,8 +18,10 @@ RUN cargo build --release -v --workspace
 
 FROM debian:buster-slim as runner-base
 
-ENV RUST_LOG="info" \
-    SERVER_PORT=8080
+ENV OPENAI_API_KEY=""\
+    RUST_LOG="info" \
+    SERVER_PORT=8080 \
+    TELOXIDE_TOKEN=""
 
 RUN apt-get update -y && apt-get upgrade -y
 

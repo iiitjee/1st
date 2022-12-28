@@ -25,7 +25,7 @@ impl Settings {
     pub fn new(mode: Option<String>, name: Option<String>) -> Self {
         let (mode, name) = (
             mode.unwrap_or_else(|| String::from("production")),
-            name.unwrap_or_else(|| String::from("conduit")),
+            name.unwrap_or_else(|| String::from("tldr")),
         );
         let (logger, server) = (Default::default(), Default::default());
         Self {

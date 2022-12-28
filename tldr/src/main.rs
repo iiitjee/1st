@@ -19,17 +19,35 @@ use std::{
     convert::From,
     sync::{Arc, Mutex},
 };
+use teloxide::prelude::Requester;
 
 ///
 pub type ChannelPackStd<T> = (std::sync::mpsc::Sender<T>, std::sync::mpsc::Receiver<T>);
 ///
 pub type TokioChannelPackMPSC<T> = (tokio::sync::mpsc::Sender<T>, tokio::sync::mpsc::Receiver<T>);
 
+async fn bot_throw_dice() -> BoxResult {
+    let bot = teloxide::Bot::from_env();
+    teloxide::repl(bot, |bot: teloxide::Bot, msg: teloxide::prelude::Message| async move {
+        bot.send_dice(msg.chat.id).await?;
+        Ok(())
+    })
+    .await;
+    Ok(())
+}
+
+fn chatgpt(prompt: &str) -> BoxResult {
+    let oai = services::OpenAI::from_env(Some("OPENAI_SECRET_KEY"));
+    let req = oai.create_request(prompt);
+    println!("{:?}", req);
+    Ok(())
+}
+
+
+
+
 #[tokio::main]
 async fn main() -> BoxResult {
-    let oai = services::OpenAI::from_env(Some("OPENAI_SECRET_KEY"));
-    let req = oai.create_request("What is music theory?");
-    println!("{:?}", req);
     // Create an application instance
     let mut app = Application::default();
     // Quickstart the application runtime with the following command
@@ -101,7 +119,7 @@ impl AppSpec for Application {
     }
 
     fn name(&self) -> String {
-        String::from("Conduit")
+        self.cnf.clone().name
     }
 
     fn settings(&self) -> Self::Cnf {
@@ -109,9 +127,9 @@ impl AppSpec for Application {
     }
 
     fn setup(&mut self) -> BoxResult<&Self> {
+        self.cnf.logger.setup(None);
         tracing_subscriber::fmt::init();
-        tracing::info!("Application initialized; completing setup...");
-
+        tracing::debug!("Application initialized; completing setup...");
         Ok(self)
     }
 

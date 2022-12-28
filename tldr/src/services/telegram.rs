@@ -5,7 +5,9 @@
 */
 use scsys::BoxResult;
 use serde::{Deserialize, Serialize};
-use teloxide::prelude::{Bot, Message, Requester};
+use teloxide::prelude::*;
+use teloxide::dispatching::repls::CommandReplExt;
+use teloxide::utils::command::BotCommands;
 
 trait TelegramBotSpec {
     fn name(&self) -> String where Self: Sized;
@@ -16,6 +18,33 @@ trait TelegramBotSpec {
     fn bot_with_token(token: String) -> Bot where Self: Sized {
         Bot::new(token)
      }
+}
+type UnitOfTime = u8;
+
+async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
+    match cmd {
+        Command::Help => bot.send_message(msg.chat.id, Command::descriptions().to_string()).await?,
+        Command::Username(username) => {
+            bot.send_message(msg.chat.id, format!("Your username is @{username}.")).await?
+        }
+        Command::UsernameAndAge { username, age } => {
+            bot.send_message(msg.chat.id, format!("Your username is @{username} and age is {age}."))
+                .await?
+        }
+    };
+
+    Ok(())
+}
+
+#[derive(BotCommands, Debug, PartialEq)]
+#[command(rename_rule = "lowercase", parse_with = "split")]
+pub enum Command {
+    #[command(description = "display this text.")]
+    Help,
+    #[command(description = "handle a username.")]
+    Username(String),
+    #[command(description = "handle a username and an age.", parse_with = "split")]
+    UsernameAndAge { username: String, age: u8 },
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]
@@ -42,6 +71,7 @@ impl TelegramBot {
             Ok(())
         })
         .await;
+        // Command::repl(self.bot(), answer).await;
         Ok(())
     }
 }

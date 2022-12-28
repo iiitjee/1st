@@ -30,7 +30,7 @@ async fn handler(bot: Bot, cmd: Command, msg: Message) -> ResponseResult<()> {
         Command::Help => {
             bot.send_message(msg.chat.id, Command::descriptions().to_string()).await?;
         }
-        Command::Query(prompt, _) => {
+        Command::Query(_, prompt) => {
             let oai = crate::services::OpenAI::from_env(None);
             let req = oai.create_request(prompt.as_str());
             let res = format!("{:?}", req);
@@ -44,12 +44,12 @@ async fn handler(bot: Bot, cmd: Command, msg: Message) -> ResponseResult<()> {
 #[derive(BotCommands, Clone, Debug, PartialEq)]
 #[command(rename_rule = "lowercase", parse_with = "split")]
 pub enum Command {
-    #[command(description = "display this text.")]
+    #[command(description = "Rolls a 6-sided die")]
     Dice,
     #[command(description = "display this text.")]
     Help,
     #[command(description = "Given a topic or url, return a concise summary")]
-    Query(Prompt, String),
+    Query(String, String),
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]

@@ -22,6 +22,26 @@ cd tldr
 cargo build --release --workspace
 ```
 
+### Docker
+
+#### *Build the image locally*
+
+```bash
+docker buildx build --tag jo3mccain/tldr:latest .
+```
+
+#### *Pull a pre-built image*
+
+```bash
+docker pull jo3mccain/tldr:latest
+```
+
+#### *Run the image*
+
+```bash
+docker run -e TELOXIDE_TOKEN=${TELOXIDE_TOKEN} -e OPENAI_API_KEY=${OPENAI_API_KEY} -p 8080:8080 -p 6379:6379 jo3mccain/tldr:latest
+```
+
 ## Usage
 
 ### Builder

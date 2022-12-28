@@ -21,7 +21,10 @@ impl Services {
         tracing::debug!("System processing...");
         
         if self.telegram {
-            crate::services::TelegramBot::try_from_env(None)?.spawn().await?;
+            std::process::Command::new("cargo")
+                .current_dir(scsys::project_root())
+                .args(["run", "-p", "pzzld-bot"])
+                .status()?;
         }
         Ok(self)
     }

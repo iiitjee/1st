@@ -21,10 +21,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        workdir:
-          - .
-        image: 
-          - tldr
+        workdir: [., bin/pzzldbot]
+        image: [tldr, pzzldbot]
     steps:
       - uses: actions/checkout@v3
       - name: Build the Docker image
@@ -34,10 +32,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dockerfile:
-          - Dockerfile
-        image: 
-          - tldr
+        dockerfile: [Dockerfile, bin/pzzldbot/Dockerfile]
+        image: [tldr, pzzldbot]
     steps:
     - uses: actions/checkout@v3
     - name: Publish to Registry

@@ -1,6 +1,10 @@
 mode = "staging"
 name = "tldr"
 
+[bot]
+name = "Puzzled"
+username = "pzzldbot"
+
 [logger]
 level = "info"
 

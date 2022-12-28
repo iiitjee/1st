@@ -10,15 +10,6 @@ name = "pzzld-bot"
 repository = "https://github.com/FL03/tldr"
 version = "0.1.0"
 
-[features]
-
-test_env = []
-
-[[bin]]
-bench = false
-name = "tldr"
-path = "src/main.rs"
-test = true
 
 [build-dependencies]
 
@@ -29,19 +20,14 @@ test = true
 acme = { features = [], git = "https://github.com/FL03/acme", branch = "v0.2.4", version = "0.2.4" }
 scsys = { features = [], version = "0.1.38" }
 
-# API
-axum = { features = ["headers", "http2", "macros"], version = "0.6.1" }
+# App
+axum-core = "0.3.0"
+clap = { features = ["cargo", "derive", "env"], version = "4.0.32" }
 http = "0.2.8"
 hyper = { features = ["full"], version = "0.14.23" }
-tokio = { features = ["full"], version = "1.23.0" }
+tokio = { features = ["macros"], version = "1.23.0" }
 tower = "0.4.13"
-tower-http = { features = ["full"], version = "0.3.5" }
-
-
-# CLI
-clap = { features = ["cargo", "derive", "env"], version = "4.0.32" }
-
-# Logging
+tower-http = { features = [], version = "0.3.5" }
 tracing = "0.1.37"
 tracing-subscriber = { features = ["env-filter"], version = "0.3.16" }
 

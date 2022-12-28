@@ -14,7 +14,7 @@ pub mod cli;
 pub mod services;
 
 use acme::prelude::AppSpec;
-use scsys::prelude::{BoxResult, Locked, State};
+use scsys::prelude::{AsyncResult, Locked, State};
 use std::{
     convert::From,
     sync::{Arc, Mutex},
@@ -26,7 +26,7 @@ pub type ChannelPackStd<T> = (std::sync::mpsc::Sender<T>, std::sync::mpsc::Recei
 ///
 pub type TokioChannelPackMPSC<T> = (tokio::sync::mpsc::Sender<T>, tokio::sync::mpsc::Receiver<T>);
 
-async fn bot_throw_dice() -> BoxResult {
+async fn bot_throw_dice() -> AsyncResult {
     let bot = teloxide::Bot::from_env();
     teloxide::repl(bot, |bot: teloxide::Bot, msg: teloxide::prelude::Message| async move {
         bot.send_dice(msg.chat.id).await?;
@@ -36,18 +36,14 @@ async fn bot_throw_dice() -> BoxResult {
     Ok(())
 }
 
-fn chatgpt(prompt: &str) -> BoxResult {
-    let oai = services::OpenAI::from_env(Some("OPENAI_SECRET_KEY"));
-    let req = oai.create_request(prompt);
-    println!("{:?}", req);
-    Ok(())
-}
-
 
 
 
 #[tokio::main]
-async fn main() -> BoxResult {
+async fn main() -> AsyncResult {
+    let bot = services::TelegramBot::from_env(None);
+    bot.spawn().await?;
+
     // Create an application instance
     let mut app = Application::default();
     // Quickstart the application runtime with the following command
@@ -75,7 +71,7 @@ impl Application {
         tokio::sync::mpsc::channel::<T>(buffer)
     }
     /// Change the application state
-    pub async fn set_state(&mut self, state: State<States>) -> BoxResult<&Self> {
+    pub async fn set_state(&mut self, state: State<States>) -> AsyncResult<&Self> {
         // Update the application state
         self.state = Arc::new(Mutex::new(state.clone()));
         // Post the change of state to the according channel(s)
@@ -84,7 +80,7 @@ impl Application {
         Ok(self)
     }
     /// Application runtime
-    pub async fn runtime(&mut self) -> BoxResult {
+    pub async fn runtime(&mut self) -> AsyncResult {
         let cli = cli::new();
         self.set_state(State::new(None, None, Some(States::Process)))
             .await?;
@@ -95,7 +91,7 @@ impl Application {
         Ok(())
     }
     /// AIO method for running the initialized application
-    pub async fn start(&mut self) -> BoxResult<&Self> {
+    pub async fn start(&mut self) -> AsyncResult<&Self> {
         tracing::info!("Startup: Application initializing...");
         self.runtime().await?;
 
@@ -126,7 +122,7 @@ impl AppSpec for Application {
         self.cnf.clone()
     }
 
-    fn setup(&mut self) -> BoxResult<&Self> {
+    fn setup(&mut self) -> AsyncResult<&Self> {
         self.cnf.logger.setup(None);
         tracing_subscriber::fmt::init();
         tracing::debug!("Application initialized; completing setup...");

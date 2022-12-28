@@ -1,3 +1,15 @@
+[workspace.package]
+authors = ["FL03 <jo3mccain@icloud.com> (https://github.com/FL03)"]
+edition = "2021"
+homepage = "https://github.com/FL03/tldr/wiki"
+license = "Apache-2.0"
+repository = "https://github.com/FL03/tldr"
+version = "0.1.0" # TODO: Update the package version
+
+[workspace.metadata.docs.rs]
+all-features = true
+rustc-args = ["--cfg", "docsrs"]
+
 [workspace]
 default-members = [
     "tldr"

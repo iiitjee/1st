@@ -12,6 +12,13 @@ use openai::{
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
 
+pub fn chatgpt(prompt: &str) -> AsyncResult {
+    let oai = OpenAI::from_env(Some("OPENAI_SECRET_KEY"));
+    let req = oai.create_request(prompt);
+    println!("{:?}", req);
+    Ok(())
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]
 pub struct OpenAI {
     secret_key: String,

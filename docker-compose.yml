@@ -1,0 +1,25 @@
+version: "4"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: application
+    depends_on:
+      - cache
+    ports:
+      - 8080:8080
+      - 6379:6379
+    restart: always
+    tty: true
+    volumes:
+      - .config:/config
+  cache:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 6379:6379
+
+volumes:
+  config:
+  data:

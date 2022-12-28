@@ -4,6 +4,12 @@ RUN apt-get update -y && apt-get upgrade -y
 
 FROM base as builder-base
 
+RUN apt-get install -y \
+    clang \
+    libssl-dev \
+    pkg-config \
+    protobuf-compiler
+
 RUN rustup update
 
 FROM builder-base as builder
@@ -37,6 +43,7 @@ FROM runner-base as runner
 
 EXPOSE 80
 EXPOSE ${SERVER_PORT}
+EXPOSE 6379
 
 ENTRYPOINT [ "tldr" ]
 CMD [ "-h" ]

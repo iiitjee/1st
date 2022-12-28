@@ -9,6 +9,9 @@ use teloxide::prelude::*;
 use teloxide::dispatching::repls::CommandReplExt;
 use teloxide::utils::command::BotCommands;
 
+
+const DEFAULT_ENV_KEY: &str = "TELOXIDE_TOKEN";
+
 trait TelegramBotSpec {
     fn name(&self) -> String where Self: Sized;
     fn username(&self) -> String where Self: Sized;
@@ -64,8 +67,12 @@ impl TelegramBot {
         Self { name, token, username }
     }
     pub fn from_env(token: Option<&str>) -> Self {
-        let token = std::env::var(token.unwrap_or("TELOXIDE_TOKEN")).ok().unwrap();
+        let token = std::env::var(token.unwrap_or(DEFAULT_ENV_KEY)).ok().unwrap();
         Self::new(Default::default(), token, Default::default())
+    }
+    pub fn try_from_env(token: Option<&str>) -> AsyncResult<Self> {
+        let token = std::env::var(token.unwrap_or(DEFAULT_ENV_KEY))?;
+        Ok(Self::new(Default::default(), token, Default::default()))
     }
     pub fn bot(&self) -> Bot {
         Bot::new(self.token.clone())

@@ -19,29 +19,15 @@ use std::{
     convert::From,
     sync::{Arc, Mutex},
 };
-use teloxide::prelude::Requester;
 
 ///
 pub type ChannelPackStd<T> = (std::sync::mpsc::Sender<T>, std::sync::mpsc::Receiver<T>);
 ///
 pub type TokioChannelPackMPSC<T> = (tokio::sync::mpsc::Sender<T>, tokio::sync::mpsc::Receiver<T>);
 
-async fn bot_throw_dice() -> AsyncResult {
-    let bot = teloxide::Bot::from_env();
-    teloxide::repl(bot, |bot: teloxide::Bot, msg: teloxide::prelude::Message| async move {
-        bot.send_dice(msg.chat.id).await?;
-        Ok(())
-    })
-    .await;
-    Ok(())
-}
-
-
-
-
 #[tokio::main]
 async fn main() -> AsyncResult {
-    let bot = services::TelegramBot::from_env(None);
+    let bot = services::TelegramBot::try_from_env(None)?;
     bot.spawn().await?;
 
     // Create an application instance

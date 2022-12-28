@@ -12,6 +12,7 @@ use openai::{
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
 
+
 #[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]
 pub struct OpenAI(String);
 
@@ -62,7 +63,7 @@ pub async fn chatgpt(prompt: &str) -> AsyncResult {
 pub struct ChatGPT(OpenAI);
 
 impl ChatGPT {
-    // pub async fn response(&self) -> String {
-    //     self.0.create_request(prompt)
-    // }
+    pub fn client(&self) -> openai::Client {
+        self.0.client()
+    }
 }

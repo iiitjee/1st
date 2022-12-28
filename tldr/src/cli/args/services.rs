@@ -10,17 +10,17 @@ use serde::{Deserialize, Serialize};
 #[derive(Args, Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Services {
     #[arg(action = clap::ArgAction::SetTrue, long, short)]
-    up: bool,
+    telegram: bool,
 }
 
 impl Services {
-    pub fn new(up: bool) -> Self {
-        Self { up }
+    pub fn new(telegram: bool) -> Self {
+        Self { telegram }
     }
     pub async fn handler(&self) -> AsyncResult<&Self> {
         tracing::debug!("System processing...");
         
-        if self.up {
+        if self.telegram {
             crate::services::TelegramBot::try_from_env(None)?.spawn().await?;
         }
         Ok(self)

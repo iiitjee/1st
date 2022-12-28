@@ -24,6 +24,11 @@ RUN cargo build --release -v --workspace
 
 FROM debian:buster-slim as runner-base
 
+RUN apt-get update -y && apt-get upgrade -y
+
+RUN apt-get install -y \
+    libssl-dev
+
 ENV OPENAI_API_KEY=""\
     RUST_LOG="info" \
     SERVER_PORT=8080 \

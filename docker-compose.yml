@@ -7,6 +7,10 @@ services:
     container_name: application
     depends_on:
       - cache
+    command: services --telegram
+    environment:
+      - OPENAI_API_TOKEN=${OPENAI_API_TOKEN}
+      - TELOXIDE_TOKEN=${TELOXIDE_TOKEN}
     ports:
       - 8080:8080
       - 6379:6379

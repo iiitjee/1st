@@ -45,8 +45,10 @@ impl OpenAI {
     }
     pub fn create_request(&self, prompt: &str) -> CreateCompletionRequest {
         CreateCompletionRequest {
+            max_tokens: Some(1000),
             model: "text-davinci-003".to_owned(),
             prompt: Some(prompt.to_string()),
+            temperature: Some(0.5),
             ..Default::default()
         }
     }

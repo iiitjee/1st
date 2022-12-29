@@ -39,9 +39,6 @@ ENV OPENAI_API_KEY=""\
     SERVER_PORT=8080 \
     TELOXIDE_TOKEN=""
 
-RUN mkdir data
-VOLUME [ "/data" ]
-
 COPY --chown=55 .config /config
 VOLUME [ "/config" ]
 

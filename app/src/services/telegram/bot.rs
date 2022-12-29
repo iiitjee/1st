@@ -99,7 +99,6 @@ pub enum Command {
     #[command(description = "Given a topic or url, return a concise summary")]
     Query(String),
 }
-
 async fn handle_oai_query(bot: &Bot, msg: Message, prompt: String) -> ResponseResult<()> {
     let oai = OpenAI::default();
     let req = oai.create_request(prompt.as_str());

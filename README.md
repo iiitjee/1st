@@ -39,7 +39,7 @@ docker pull jo3mccain/pzzld-bot:latest
 #### *Run the image*
 
 ```bash
-docker run -e TELOXIDE_TOKEN="${TELOXIDE_TOKEN}" -e OPENAI_API_KEY="${OPENAI_API_KEY}" -P jo3mccain/pzzld-bot:latest
+docker run -e OPENAI_API_KEY="${OPENAI_API_KEY}" -e TELOXIDE_TOKEN="${TELOXIDE_TOKEN}" -P jo3mccain/pzzldbot:latest
 ```
 
 ## Usage

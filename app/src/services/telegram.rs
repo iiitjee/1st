@@ -5,20 +5,29 @@
 */
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
-use teloxide::prelude::*;
 use teloxide::dispatching::repls::CommandReplExt;
+use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
-
 
 const DEFAULT_ENV_KEY: &str = "TELOXIDE_TOKEN";
 
 trait TelegramBotSpec {
-    fn name(&self) -> String where Self: Sized;
-    fn username(&self) -> String where Self: Sized;
-    fn bot_from_env() -> Bot where Self: Sized {
-       Bot::from_env()
+    fn name(&self) -> String
+    where
+        Self: Sized;
+    fn username(&self) -> String
+    where
+        Self: Sized;
+    fn bot_from_env() -> Bot
+    where
+        Self: Sized,
+    {
+        Bot::from_env()
     }
-    fn bot_with_token(token: String) -> Bot where Self: Sized {
+    fn bot_with_token(token: String) -> Bot
+    where
+        Self: Sized,
+    {
         Bot::new(token)
     }
 }
@@ -42,15 +51,20 @@ async fn handler(bot: Bot, cmd: Command, msg: Message) -> ResponseResult<()> {
             bot.send_dice(msg.chat.id).await?;
         }
         Command::Help => {
-            bot.send_message(msg.chat.id, Command::descriptions().to_string()).await?;
+            bot.send_message(msg.chat.id, Command::descriptions().to_string())
+                .await?;
         }
         Command::Query(prompt) => {
             let oai = super::OpenAI::from_env(None);
             let req = oai.create_request(prompt.as_str());
             let res = oai.response(req).await.expect("");
-            let choices = res.choices.iter().map(|i| format!("{:?}", i.text.clone())).collect::<String>();
+            let choices = res
+                .choices
+                .iter()
+                .map(|i| format!("{:?}", i.text.clone()))
+                .collect::<String>();
             bot.send_message(msg.chat.id, choices).await?;
-        },
+        }
     };
 
     Ok(())
@@ -65,10 +79,16 @@ pub struct TelegramBot {
 
 impl TelegramBot {
     pub fn new(name: String, token: String, username: String) -> Self {
-        Self { name, token, username }
+        Self {
+            name,
+            token,
+            username,
+        }
     }
     pub fn from_env(token: Option<&str>) -> Self {
-        let token = std::env::var(token.unwrap_or(DEFAULT_ENV_KEY)).ok().unwrap();
+        let token = std::env::var(token.unwrap_or(DEFAULT_ENV_KEY))
+            .ok()
+            .unwrap();
         Self::new(Default::default(), token, Default::default())
     }
     pub fn try_from_env(token: Option<&str>) -> AsyncResult<Self> {
@@ -82,7 +102,8 @@ impl TelegramBot {
         teloxide::repl(self.bot(), |bot: Bot, msg: Message| async move {
             bot.send_dice(msg.chat.id).await?;
             Ok(())
-        }).await;
+        })
+        .await;
         Ok(())
     }
     pub async fn spawn(&self) -> AsyncResult {
@@ -92,11 +113,17 @@ impl TelegramBot {
 }
 
 impl TelegramBotSpec for TelegramBot {
-    fn name(&self) -> String where Self: Sized {
+    fn name(&self) -> String
+    where
+        Self: Sized,
+    {
         self.name.clone()
     }
 
-    fn username(&self) -> String where Self: Sized {
+    fn username(&self) -> String
+    where
+        Self: Sized,
+    {
         self.username.clone()
     }
 }

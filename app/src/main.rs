@@ -39,8 +39,12 @@ pub trait Operator {
     type App: AppSpec;
     type Cmd: clap::Subcommand;
 
-    fn application(&self) -> &Self::App where Self: Sized;
-    fn command(&self) -> &Self::Cmd where Self: Sized;
+    fn application(&self) -> &Self::App
+    where
+        Self: Sized;
+    fn command(&self) -> &Self::Cmd
+    where
+        Self: Sized;
 }
 
 #[derive(Clone, Debug)]

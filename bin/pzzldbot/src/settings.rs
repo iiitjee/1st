@@ -7,14 +7,9 @@ use scsys::prelude::config::{Config, Environment};
 use scsys::prelude::{try_collect_config_files, ConfigResult, Configurable, Logger, Server};
 use serde::{Deserialize, Serialize};
 
-
 pub enum Services {
-    OpenAI {
-        secret_key: String
-    },
-    Telegram {
-        token: String
-    }
+    OpenAI { secret_key: String },
+    Telegram { token: String },
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

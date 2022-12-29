@@ -19,7 +19,7 @@ impl Services {
     }
     pub async fn handler(&self) -> AsyncResult<&Self> {
         tracing::debug!("System processing...");
-        
+
         if self.telegram {
             std::process::Command::new("cargo")
                 .current_dir(scsys::project_root())

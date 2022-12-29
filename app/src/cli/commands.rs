@@ -8,7 +8,6 @@ use clap::Subcommand;
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Clone, Debug, Deserialize, Hash, PartialEq, Eq, Serialize, Subcommand)]
 pub enum Commands {
     Account {

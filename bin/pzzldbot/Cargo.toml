@@ -22,7 +22,7 @@ test = false
 
 [dependencies]
 # Custom libraries
-acme = { features = [], git = "https://github.com/FL03/acme", branch = "v0.2.4", version = "0.2.4" }
+acme = { default-features = false, features = ["core"], git = "https://github.com/FL03/acme", branch = "v0.2.4", version = "0.2.4" }
 scsys = { features = [], version = "0.1.38" }
 
 # App

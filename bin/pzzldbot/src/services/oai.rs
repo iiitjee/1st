@@ -12,8 +12,7 @@ use openai::{
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
 
-
-#[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Hash, Eq, PartialEq, Serialize)]
 pub struct OpenAI(String);
 
 impl OpenAI {
@@ -52,12 +51,26 @@ impl OpenAI {
     }
 }
 
+impl Default for OpenAI {
+    fn default() -> Self {
+        Self::from_env(None)
+    }
+}
+
 pub async fn chatgpt(prompt: &str) -> AsyncResult {
     let oai = OpenAI::from_env(Some("OPENAI_SECRET_KEY"));
     let req = oai.create_request(prompt);
     let res = oai.response(req).await?;
     println!("{:?}", res.choices);
     Ok(())
+}
+
+pub fn clean_choices(response: CreateCompletionResponse) -> String {
+    let mut tmp = String::new();
+    for i in response.choices {
+        tmp.push_str(&i.text);
+    }
+    tmp.rsplit("\n").collect()
 }
 
 pub struct ChatGPT(OpenAI);

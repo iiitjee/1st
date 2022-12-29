@@ -12,7 +12,6 @@ services:
       - TELOXIDE_TOKEN="${TELOXIDE_TOKEN}"
     ports:
       - 8080:8080
-      - 6379:6379
     restart: always
     tty: true
     volumes:

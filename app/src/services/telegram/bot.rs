@@ -4,7 +4,7 @@
     Description: ... Summary ...
 */
 use super::{TelegramBotOperator, TelegramBotSpec, DEFAULT_ENV_KEY};
-use crate::services::oai::{clean_choices, OpenAI};
+use crate::services::openai::{clean_choices, OpenAI};
 
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
@@ -12,7 +12,7 @@ use teloxide::dispatching::repls::CommandReplExt;
 use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
 
-#[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Hash, Eq, PartialEq, Serialize)]
 pub struct TelegramBotConfig {
     pub name: String,
     token: String,
@@ -36,6 +36,12 @@ impl TelegramBotConfig {
     pub fn try_from_env(token: Option<&str>) -> AsyncResult<Self> {
         let token = std::env::var(token.unwrap_or(DEFAULT_ENV_KEY))?;
         Ok(Self::new(Default::default(), token, Default::default()))
+    }
+}
+
+impl Default for TelegramBotConfig {
+    fn default() -> Self {
+        Self::from_env(None)
     }
 }
 

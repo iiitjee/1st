@@ -1,4 +1,4 @@
-# tldr
+# pzzld-bot
 
 [![Clippy](https://github.com/FL03/tldr/actions/workflows/clippy.yml/badge.svg)](https://github.com/FL03/tldr/actions/workflows/clippy.yml)
 [![Docker](https://github.com/FL03/tldr/actions/workflows/docker.yml/badge.svg)](https://github.com/FL03/tldr/actions/workflows/docker.yml)
@@ -17,8 +17,8 @@ Make sure you have rust installed on your host device!
 Start by cloning the repository
 
 ```bash
-git clone https://github.com/FL03/tldr
-cd tldr
+git clone https://github.com/FL03/pzzld-bot
+cd pzzld-bot
 cargo build --release --workspace
 ```
 
@@ -27,19 +27,19 @@ cargo build --release --workspace
 #### *Build the image locally*
 
 ```bash
-docker buildx build --tag jo3mccain/tldr:latest .
+docker buildx build --tag jo3mccain/pzzld-bot:latest .
 ```
 
 #### *Pull a pre-built image*
 
 ```bash
-docker pull jo3mccain/tldr:latest
+docker pull jo3mccain/pzzld-bot:latest
 ```
 
 #### *Run the image*
 
 ```bash
-docker run -e TELOXIDE_TOKEN=${TELOXIDE_TOKEN} -e OPENAI_API_KEY=${OPENAI_API_KEY} -p 8080:8080 -p 6379:6379 jo3mccain/tldr:latest
+docker run -e TELOXIDE_TOKEN="${TELOXIDE_TOKEN}" -e OPENAI_API_KEY="${OPENAI_API_KEY}" -P jo3mccain/pzzld-bot:latest
 ```
 
 ## Usage
@@ -59,5 +59,5 @@ Please make sure to update tests as appropriate.
 
 ## License
 
-* [Apache-2.0](https://choosealicense.com/licenses/apache-2.0/)
-* [MIT](https://choosealicense.com/licenses/mit/)
+- [Apache-2.0](https://choosealicense.com/licenses/apache-2.0/)
+- [MIT](https://choosealicense.com/licenses/mit/)

@@ -9,6 +9,7 @@ pub(crate) mod context;
 pub(crate) mod settings;
 pub(crate) mod states;
 
+pub mod cli;
 pub mod services;
 
 use acme::prelude::AppSpec;
@@ -51,6 +52,7 @@ pub trait Operator {
 pub struct Application {
     pub cnf: Settings,
     pub ctx: Context,
+    pub interface: Vec<Interface>,
     pub state: Locked<State<States>>,
 }
 
@@ -59,7 +61,12 @@ impl Application {
         cnf.logger().clone().setup(None);
         tracing_subscriber::fmt::init();
         tracing::info!("Application initialized; completing setup...");
-        Self { cnf, ctx, state }
+        Self {
+            cnf,
+            ctx,
+            interface: Vec::new(),
+            state,
+        }
     }
     // initializes a pack of channels
     pub fn channels<T>(&self, buffer: usize) -> TokioChannelPackMPSC<T> {
@@ -79,8 +86,8 @@ impl Application {
         self.set_state(State::new(None, None, Some(States::Process)))
             .await?;
         // Fetch the initialized cli and process the results
-        let bot_cnf = TelegramBotConfig::try_from_env(None)?;
-        TelegramBot::new(bot_cnf).spawn().await?;
+        cli::new().handler().await?;
+        // Update the application state post-processing
         self.set_state(State::new(None, None, Some(States::Complete)))
             .await?;
         Ok(())
@@ -150,5 +157,16 @@ impl From<Context> for Application {
 impl std::fmt::Display for Application {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", serde_json::to_string(&self.ctx).unwrap())
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum Interface {
+    Cli(cli::CommandLineInterface),
+}
+
+impl Default for Interface {
+    fn default() -> Self {
+        Self::Cli(Default::default())
     }
 }

@@ -1,13 +1,13 @@
 [package]
 authors = ["FL03 <jo3mccain@icloud.com> (https://github.com/FL03)"]
 categories = []
-description = "pzzldbot helps users by quickly summarizing content leveraging intelligent systems and diverse data-sources"
+description = "pzzld-bot helps users by quickly summarizing content leveraging intelligent systems and diverse data-sources"
 edition = "2021"
-homepage = "https://github.com/FL03/tldr/wiki"
+homepage = "https://github.com/FL03/pzzld-bot/wiki"
 keywords = []
 license = "Apache-2.0"
 name = "pzzld-bot"
-repository = "https://github.com/FL03/tldr"
+repository = "https://github.com/FL03/pzzld-bot"
 version = "0.1.0"
 
 [[bin]]
@@ -26,6 +26,7 @@ acme = { default-features = false, features = ["core"], git = "https://github.co
 scsys = { features = [], version = "0.1.38" }
 
 # App
+anyhow = "1.0.68"
 async-trait = "0.1.60"
 axum-core = "0.3.0"
 clap = { features = ["cargo", "derive", "env"], version = "4.0.32" }
@@ -45,7 +46,7 @@ strum = { features = ["derive"], version = "0.24.1" }
 
 # Services
 async-openai = "0.4.0"
-teloxide = { features = ["macros"], version = "0.11.3" }
+teloxide = { features = ["full"], version = "0.11.3" }
 
 [package.metadata.docs.rs]
 all-features = true

@@ -3,5 +3,6 @@
     Contrib: FL03 <j3mccain@gmail.com> (https://github.com/FL03)
     Description: ... Summary ...
 */
-pub mod oai;
+
+pub mod openai;
 pub mod telegram;

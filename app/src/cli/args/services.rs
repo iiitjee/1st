@@ -27,7 +27,7 @@ impl Services {
         tracing::info!("Setting up the workspace...");
         if self.telegram {
             let cnf = TelegramBotConfig::try_from_env(None)?;
-            TelegramBot::new(cnf).spawn().await.expect("");
+            TelegramBot::new(cnf).spawn().await?;
         }
         Ok(self)
     }

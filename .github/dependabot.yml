@@ -13,7 +13,7 @@ updates:
     schedule:
         interval: daily
   - package-ecosystem: cargo
-    directory: /tldr
+    directory: /app
     schedule:
         interval: daily
 

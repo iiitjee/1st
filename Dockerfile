@@ -28,9 +28,9 @@ RUN apt-get update -y && apt-get upgrade -y
 
 RUN apt-get install -y \
     clang \
-    pkg-config \
     libc-dev \
-    libssl-dev
+    libssl-dev \
+    pkg-config
 
 FROM runner-base as runner
 
@@ -53,4 +53,5 @@ EXPOSE 80
 EXPOSE ${SERVER_PORT}
 EXPOSE 6379
 
-CMD [ "pzzldbot" ]
+ENTRYPOINT [ "pzzldbot" ]
+CMD [ "services", "--telegram" ]

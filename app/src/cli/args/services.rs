@@ -5,10 +5,11 @@
 */
 use crate::services::telegram::{TelegramBot, TelegramBotConfig};
 
-use acme::prelude::AsyncSpawable;
 use clap::Args;
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use tokio::task::JoinHandle;
 
 #[derive(Args, Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Services {
@@ -22,12 +23,13 @@ impl Services {
     pub fn new(extras: bool, telegram: bool) -> Self {
         Self { extras, telegram }
     }
-
     pub async fn handler(&self) -> AsyncResult<&Self> {
-        tracing::info!("Setting up the workspace...");
+        tracing::debug!("Processing service related command...");
         if self.telegram {
-            let cnf = TelegramBotConfig::try_from_env(None)?;
-            TelegramBot::new(cnf).spawn().await?;
+            tracing::info!("Initializing the telegram bot: Puzzled (@pzzldbot)");
+            let cnf = TelegramBotConfig::default();
+            TelegramBot::new(cnf.clone()).spawn().await?;
+            
         }
         Ok(self)
     }

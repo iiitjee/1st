@@ -30,6 +30,8 @@ pub(crate) mod context {
     use clap::Parser;
     use scsys::AsyncResult;
     use serde::{Deserialize, Serialize};
+    use std::sync::Arc;
+    use tokio::task::JoinHandle;
 
     #[derive(Clone, Debug, Deserialize, Hash, Parser, PartialEq, Serialize)]
     #[clap(about, author, version)]
@@ -37,8 +39,10 @@ pub(crate) mod context {
     pub struct CommandLineInterface {
         #[clap(subcommand)]
         pub command: Option<Commands>,
-        #[arg(action = clap::ArgAction::SetTrue, long, short)]
+        #[arg(action = clap::ArgAction::SetTrue, long)]
         pub debug: bool,
+        #[arg(action = clap::ArgAction::SetTrue, long, short)]
+        pub detached: bool,
         #[arg(action = clap::ArgAction::SetTrue, long, short)]
         pub update: bool,
     }

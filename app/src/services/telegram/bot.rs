@@ -7,11 +7,14 @@ use super::{TelegramBotSpec, DEFAULT_ENV_KEY};
 use crate::services::openai::{clean_choices, OpenAI};
 
 use acme::AsyncSpawable;
-use scsys::AsyncResult;
+use scsys::prelude::{AsyncResult, Configurable};
 use serde::{Deserialize, Serialize};
 use teloxide::dispatching::repls::CommandReplExt;
 use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
+
+use std::sync::Arc;
+use tokio::task::JoinHandle;
 
 /// Configuration parameters for the [TelegramBot]
 #[derive(Clone, Debug, Deserialize, Hash, Eq, PartialEq, Serialize)]
@@ -41,6 +44,8 @@ impl TelegramBotConfig {
     }
 }
 
+
+
 impl Default for TelegramBotConfig {
     fn default() -> Self {
         Self::from_env(None)
@@ -58,7 +63,19 @@ impl TelegramBot {
     pub fn new(cnf: TelegramBotConfig) -> Self {
         Self { cnf }
     }
+    pub async fn handle(&self) -> JoinHandle<Arc<Self>> {
+        let bot = Arc::new(self.clone());
+        tokio::spawn(async {
+            bot.spawn().await.expect("");
+            bot
+        })
+    }
+    pub async fn spawn(&self) -> AsyncResult<&Self> {
+        Command::repl(self.bot(), handler).await;
+        Ok(self)
+    }
 }
+
 
 impl TelegramBotSpec for TelegramBot {
     fn name(&self) -> String
@@ -83,13 +100,21 @@ impl TelegramBotSpec for TelegramBot {
     }
 }
 
-#[async_trait::async_trait]
-impl AsyncSpawable for TelegramBot {
-    async fn spawn(&mut self) -> AsyncResult<&Self> {
-        Command::repl(self.bot(), handler).await;
-        Ok(self)
+impl Configurable for TelegramBot {
+    type Settings = TelegramBotConfig;
+
+    fn settings(&self) -> &Self::Settings {
+        &self.cnf
     }
 }
+
+// #[async_trait::async_trait]
+// impl AsyncSpawable for TelegramBot {
+//     async fn spawn(&mut self) -> AsyncResult<&Self> {
+//         Command::repl(self.bot(), handler).await;
+//         Ok(self)
+//     }
+// }
 
 /// Defines the desired command structure for the [TelegramBot]
 #[derive(BotCommands, Clone, Debug, PartialEq)]

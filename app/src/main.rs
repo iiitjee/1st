@@ -72,7 +72,8 @@ impl Application {
         self.set_state(State::new(None, None, Some(States::Process)))
             .await?;
         // Fetch the initialized cli and process the results
-        cli::new().handler().await?;
+        let cli = cli::new();
+        cli.handler().await?;
         // Update the application state post-processing
         self.set_state(State::new(None, None, Some(States::Complete)))
             .await?;

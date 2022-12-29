@@ -48,12 +48,7 @@ EXPOSE 80
 EXPOSE ${SERVER_PORT}
 EXPOSE 6379
 
-ENTRYPOINT [ "pzzldbot" ]
-
-FROM runner as telegram
-
-CMD [ "services", "--telegram" ]
-
 FROM runner
 
-CMD [ "-h" ]
+ENTRYPOINT [ "pzzldbot" ]
+CMD [ "services", "--telegram" ]

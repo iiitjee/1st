@@ -13,6 +13,7 @@ use teloxide::dispatching::repls::CommandReplExt;
 use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
 
+/// Configuration parameters for the [TelegramBot]
 #[derive(Clone, Debug, Deserialize, Hash, Eq, PartialEq, Serialize)]
 pub struct TelegramBotConfig {
     pub name: String,
@@ -46,6 +47,8 @@ impl Default for TelegramBotConfig {
     }
 }
 
+/// A verbose bot intelligently servicing users leveraging OpenAi's ChatGPT for natural language processing of simple queries
+/// The primary goal for the bot remains offering complete report generation utilities for given articles, topics, etc.
 #[derive(Clone, Debug, Default, Deserialize, Hash, Eq, PartialEq, Serialize)]
 pub struct TelegramBot {
     pub cnf: TelegramBotConfig,
@@ -88,7 +91,7 @@ impl AsyncSpawable for TelegramBot {
     }
 }
 
-/// Defines the desired command structure for the bot
+/// Defines the desired command structure for the [TelegramBot]
 #[derive(BotCommands, Clone, Debug, PartialEq)]
 #[command(rename_rule = "lowercase")]
 pub enum Command {
@@ -99,6 +102,7 @@ pub enum Command {
     #[command(description = "Given a topic or url, return a concise summary")]
     Query(String),
 }
+/// A verbose handler for dealing with chatgpt related queries; returns a [ResponseResult]
 async fn handle_oai_query(bot: &Bot, msg: Message, prompt: String) -> ResponseResult<()> {
     let oai = OpenAI::default();
     let req = oai.create_request(prompt.as_str());

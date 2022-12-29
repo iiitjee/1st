@@ -34,18 +34,6 @@ async fn main() -> AsyncResult {
     Ok(())
 }
 
-pub trait Operator {
-    type App: AppSpec;
-    type Cmd: clap::Subcommand;
-
-    fn application(&self) -> &Self::App
-    where
-        Self: Sized;
-    fn command(&self) -> &Self::Cmd
-    where
-        Self: Sized;
-}
-
 #[derive(Clone, Debug)]
 pub struct Application {
     pub cnf: Settings,

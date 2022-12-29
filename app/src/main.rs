@@ -1,5 +1,5 @@
 /*
-    Appellation: Conduit <binary>
+    Appellation: pzzldbot <binary>
     Contrib: FL03 <jo3mccain@icloud.com>
     Description: ... summary ...
 */
@@ -9,8 +9,6 @@ pub(crate) mod context;
 pub(crate) mod settings;
 pub(crate) mod states;
 
-pub mod api;
-pub mod cli;
 pub mod services;
 
 use acme::prelude::AppSpec;
@@ -19,6 +17,8 @@ use std::{
     convert::From,
     sync::{Arc, Mutex},
 };
+
+use self::services::telegram::{TelegramBot, TelegramBotConfig, TelegramBotOperator};
 
 ///
 pub type ChannelPackStd<T> = (std::sync::mpsc::Sender<T>, std::sync::mpsc::Receiver<T>);
@@ -76,11 +76,11 @@ impl Application {
     }
     /// Application runtime
     pub async fn runtime(&mut self) -> AsyncResult {
-        let cli = cli::new();
         self.set_state(State::new(None, None, Some(States::Process)))
             .await?;
         // Fetch the initialized cli and process the results
-        cli.handler().await?;
+        let bot_cnf = TelegramBotConfig::try_from_env(None)?;
+        TelegramBot::new(bot_cnf).spawn().await?;
         self.set_state(State::new(None, None, Some(States::Complete)))
             .await?;
         Ok(())

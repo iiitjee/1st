@@ -19,7 +19,6 @@ exclude = [
 ]
 members = [
     "app",
-    "bin/*",
 ]
 
 [profile.dev]

@@ -27,14 +27,17 @@ FROM debian:buster-slim as runner-base
 RUN apt-get update -y && apt-get upgrade -y
 
 RUN apt-get install -y \
+    clang \
+    pkg-config \
+    libc-dev \
     libssl-dev
+
+FROM runner-base as runner
 
 ENV OPENAI_API_KEY=""\
     RUST_LOG="info" \
     SERVER_PORT=8080 \
     TELOXIDE_TOKEN=""
-
-RUN apt-get update -y && apt-get upgrade -y
 
 RUN mkdir data
 VOLUME [ "/data" ]
@@ -42,13 +45,12 @@ VOLUME [ "/data" ]
 COPY --chown=55 .config /config
 VOLUME [ "/config" ]
 
-COPY --chown=55 --from=builder /workspace/target/release/tldr /bin/tldr
+COPY --chown=55 --from=builder /workspace/target/release/pzzldbot /bin/pzzldbot
 
-FROM runner-base as runner
+FROM runner
 
 EXPOSE 80
 EXPOSE ${SERVER_PORT}
 EXPOSE 6379
 
-ENTRYPOINT [ "tldr" ]
-CMD [ "-h" ]
+CMD [ "pzzldbot" ]

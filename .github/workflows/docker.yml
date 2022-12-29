@@ -16,7 +16,7 @@ env:
   IMAGE_TAG: latest
 
 jobs:
-  application:
+  publisher:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -24,18 +24,6 @@ jobs:
       uses: elgohr/Publish-Docker-Github-Action@v5
       with:
         dockerfile: Dockerfile
-        name: ${{ secrets.DOCKERHUB_USERNAME }}/tldr
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        snapshot: true
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-  service:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@v5
-      with:
-        dockerfile: bin/pzzldbot/Dockerfile
         name: ${{ secrets.DOCKERHUB_USERNAME }}/pzzldbot
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         snapshot: true

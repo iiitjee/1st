@@ -3,12 +3,12 @@
     Contrib: FL03 <jo3mccain@icloud.com>
     Description: ... Summary ...
 */
-use crate::services::telegram::{TelegramBot, TelegramBotConfig, TelegramBotOperator};
+use crate::services::telegram::{TelegramBot, TelegramBotConfig};
 
+use acme::prelude::AsyncSpawable;
 use clap::Args;
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
 #[derive(Args, Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Services {
@@ -27,10 +27,7 @@ impl Services {
         tracing::info!("Setting up the workspace...");
         if self.telegram {
             let cnf = TelegramBotConfig::try_from_env(None)?;
-            let bot = Arc::new(TelegramBot::new(cnf));
-            tokio::spawn(async move {
-                bot.spawn().await.expect("");
-            });
+            TelegramBot::new(cnf).spawn().await.expect("");
         }
         Ok(self)
     }

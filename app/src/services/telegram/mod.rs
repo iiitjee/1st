@@ -3,13 +3,12 @@
     Contrib: FL03 <j3mccain@gmail.com> (https://github.com/FL03)
     Description: ... Summary ...
 */
-pub use self::bot::*;
+pub use self::{bot::*, specs::*};
 
 pub(crate) mod bot;
 
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
-use teloxide::Bot;
 
 const DEFAULT_ENV_KEY: &str = "TELOXIDE_TOKEN";
 
@@ -35,33 +34,31 @@ impl TryFrom<Option<&str>> for TelegramBotToken {
     }
 }
 
-pub trait TelegramBotSpec {
-    fn bot(&self) -> Bot
-    where
-        Self: Sized;
-    fn name(&self) -> String
-    where
-        Self: Sized;
-    fn username(&self) -> String
-    where
-        Self: Sized;
-    fn bot_from_env() -> Bot
-    where
-        Self: Sized,
-    {
-        Bot::from_env()
-    }
-    fn bot_with_token(token: String) -> Bot
-    where
-        Self: Sized,
-    {
-        Bot::new(token)
-    }
-}
+pub(crate) mod specs {
+    use teloxide::Bot;
 
-#[async_trait::async_trait]
-pub trait TelegramBotOperator: TelegramBotSpec {
-    async fn spawn(&self) -> AsyncResult
-    where
-        Self: Sized;
+    ///
+    pub trait TelegramBotSpec {
+        fn bot(&self) -> Bot
+        where
+            Self: Sized;
+        fn name(&self) -> String
+        where
+            Self: Sized;
+        fn username(&self) -> String
+        where
+            Self: Sized;
+        fn bot_from_env() -> Bot
+        where
+            Self: Sized,
+        {
+            Bot::from_env()
+        }
+        fn bot_with_token(token: String) -> Bot
+        where
+            Self: Sized,
+        {
+            Bot::new(token)
+        }
+    }
 }

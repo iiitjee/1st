@@ -19,8 +19,6 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use self::services::telegram::{TelegramBot, TelegramBotConfig, TelegramBotOperator};
-
 ///
 pub type ChannelPackStd<T> = (std::sync::mpsc::Sender<T>, std::sync::mpsc::Receiver<T>);
 ///

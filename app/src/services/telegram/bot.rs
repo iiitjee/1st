@@ -3,9 +3,10 @@
     Contrib: FL03 <j3mccain@gmail.com> (https://github.com/FL03)
     Description: ... Summary ...
 */
-use super::{TelegramBotOperator, TelegramBotSpec, DEFAULT_ENV_KEY};
+use super::{TelegramBotSpec, DEFAULT_ENV_KEY};
 use crate::services::openai::{clean_choices, OpenAI};
 
+use acme::AsyncSpawable;
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
 use teloxide::dispatching::repls::CommandReplExt;
@@ -80,13 +81,10 @@ impl TelegramBotSpec for TelegramBot {
 }
 
 #[async_trait::async_trait]
-impl TelegramBotOperator for TelegramBot {
-    async fn spawn(&self) -> AsyncResult
-    where
-        Self: Sized,
-    {
+impl AsyncSpawable for TelegramBot {
+    async fn spawn(&mut self) -> AsyncResult<&Self> {
         Command::repl(self.bot(), handler).await;
-        Ok(())
+        Ok(self)
     }
 }
 

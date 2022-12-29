@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: telegram
     container_name: pzzld-bot
     depends_on:
       - cache

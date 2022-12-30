@@ -4,9 +4,8 @@
     Description: ... Summary ...
 */
 use super::{TelegramBotSpec, DEFAULT_ENV_KEY};
-use crate::services::openai::{clean_choices, OpenAI};
+use crate::services::openai::{clean_choices, ChatGPT};
 
-use acme::AsyncSpawable;
 use scsys::prelude::{AsyncResult, Configurable};
 use serde::{Deserialize, Serialize};
 use teloxide::dispatching::repls::CommandReplExt;
@@ -44,8 +43,6 @@ impl TelegramBotConfig {
     }
 }
 
-
-
 impl Default for TelegramBotConfig {
     fn default() -> Self {
         Self::from_env(None)
@@ -75,7 +72,6 @@ impl TelegramBot {
         Ok(self)
     }
 }
-
 
 impl TelegramBotSpec for TelegramBot {
     fn name(&self) -> String
@@ -129,9 +125,8 @@ pub enum Command {
 }
 /// A verbose handler for dealing with chatgpt related queries; returns a [ResponseResult]
 async fn handle_oai_query(bot: &Bot, msg: Message, prompt: String) -> ResponseResult<()> {
-    let oai = OpenAI::default();
-    let req = oai.create_request(prompt.as_str());
-    let res = oai.response(req).await.expect("");
+    let gpt = ChatGPT::default();
+    let res = gpt.response(gpt.request(prompt.as_str())).await.expect("");
     bot.send_message(msg.chat.id, clean_choices(res)).await?;
     Ok(())
 }

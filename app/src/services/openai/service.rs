@@ -4,13 +4,8 @@
     Description: ... Summary ...
 */
 use super::DEFAULT_OPENAI_ENV;
-use async_openai as oai;
 
-use oai::{
-    types::{CreateCompletionRequest, CreateCompletionResponse, Prompt},
-    Client, Completion,
-};
-use scsys::AsyncResult;
+use async_openai::Client;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Hash, Eq, PartialEq, Serialize)]
@@ -34,22 +29,6 @@ impl OpenAI {
     pub fn client(&self) -> Client {
         Client::new().with_api_key(self.0.as_str())
     }
-    pub fn create_request(&self, prompt: &str) -> CreateCompletionRequest {
-        CreateCompletionRequest {
-            max_tokens: Some(1000),
-            model: "text-davinci-003".to_owned(),
-            prompt: Some(Prompt::String(prompt.to_string())),
-            temperature: Some(0.5),
-            ..Default::default()
-        }
-    }
-    pub async fn response(
-        &self,
-        req: CreateCompletionRequest,
-    ) -> AsyncResult<CreateCompletionResponse> {
-        let res = Completion::create(&self.client(), req).await?;
-        Ok(res)
-    }
 }
 
 impl Default for OpenAI {
@@ -57,5 +36,3 @@ impl Default for OpenAI {
         Self::from_env(None)
     }
 }
-
-pub struct ChatGPT(OpenAI);

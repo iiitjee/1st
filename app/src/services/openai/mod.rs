@@ -3,8 +3,9 @@
     Contrib: FL03 <j3mccain@gmail.com> (https://github.com/FL03)
     Description: ... Summary ...
 */
-pub use self::{service::*, specs::*, utils::*};
+pub use self::{chatgpt::*, service::*, specs::*, utils::*};
 
+pub(crate) mod chatgpt;
 pub(crate) mod service;
 
 const DEFAULT_OPENAI_ENV: &str = "OPENAI_API_KEY";
@@ -21,16 +22,14 @@ pub(crate) mod specs {
 }
 
 pub(crate) mod utils {
-    use super::OpenAI;
+    use super::*;
     use async_openai::types::CreateCompletionResponse;
     use scsys::AsyncResult;
 
-    pub async fn chatgpt(prompt: &str) -> AsyncResult {
-        let oai = OpenAI::from_env(None);
-        let req = oai.create_request(prompt);
-        let res = oai.response(req).await?;
-        println!("{:?}", res.choices);
-        Ok(())
+    pub async fn chatgpt(prompt: &str) -> AsyncResult<String> {
+        let chatgpt = ChatGPT::default();
+        let res = chatgpt.response(chatgpt.request(prompt)).await?;
+        Ok(clean_choices(res))
     }
 
     pub fn clean_choices(response: CreateCompletionResponse) -> String {

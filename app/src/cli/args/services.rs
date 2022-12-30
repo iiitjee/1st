@@ -8,8 +8,6 @@ use crate::services::telegram::{TelegramBot, TelegramBotConfig};
 use clap::Args;
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-use tokio::task::JoinHandle;
 
 #[derive(Args, Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Services {
@@ -29,7 +27,6 @@ impl Services {
             tracing::info!("Initializing the telegram bot: Puzzled (@pzzldbot)");
             let cnf = TelegramBotConfig::default();
             TelegramBot::new(cnf.clone()).spawn().await?;
-            
         }
         Ok(self)
     }

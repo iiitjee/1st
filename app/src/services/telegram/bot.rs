@@ -3,14 +3,12 @@
     Contrib: FL03 <j3mccain@gmail.com> (https://github.com/FL03)
     Description: ... Summary ...
 */
-use super::{TelegramBotSpec, DEFAULT_ENV_KEY};
-use crate::services::openai::{clean_choices, ChatGPT};
+use super::{handler, Command, TelegramBotSpec, DEFAULT_ENV_KEY};
 
 use scsys::prelude::{AsyncResult, Configurable};
 use serde::{Deserialize, Serialize};
-use teloxide::dispatching::repls::CommandReplExt;
+
 use teloxide::prelude::*;
-use teloxide::utils::command::BotCommands;
 
 use std::sync::Arc;
 use tokio::task::JoinHandle;
@@ -102,49 +100,4 @@ impl Configurable for TelegramBot {
     fn settings(&self) -> &Self::Settings {
         &self.cnf
     }
-}
-
-// #[async_trait::async_trait]
-// impl AsyncSpawable for TelegramBot {
-//     async fn spawn(&mut self) -> AsyncResult<&Self> {
-//         Command::repl(self.bot(), handler).await;
-//         Ok(self)
-//     }
-// }
-
-/// Defines the desired command structure for the [TelegramBot]
-#[derive(BotCommands, Clone, Debug, PartialEq)]
-#[command(rename_rule = "lowercase")]
-pub enum Command {
-    #[command(description = "Rolls a 6-sided die")]
-    Dice,
-    #[command(description = "display this text.")]
-    Help,
-    #[command(description = "Given a topic or url, return a concise summary")]
-    Query(String),
-}
-/// A verbose handler for dealing with chatgpt related queries; returns a [ResponseResult]
-async fn handle_oai_query(bot: &Bot, msg: Message, prompt: String) -> ResponseResult<()> {
-    let gpt = ChatGPT::default();
-    let res = gpt.response(gpt.request(prompt.as_str())).await.expect("");
-    bot.send_message(msg.chat.id, clean_choices(res)).await?;
-    Ok(())
-}
-
-/// Handles the commands issued to the bot and returns a [ResponseResult]
-async fn handler(bot: Bot, cmd: Command, msg: Message) -> ResponseResult<()> {
-    match cmd {
-        Command::Dice => {
-            bot.send_dice(msg.chat.id).await?;
-        }
-        Command::Help => {
-            bot.send_message(msg.chat.id, Command::descriptions().to_string())
-                .await?;
-        }
-        Command::Query(prompt) => {
-            handle_oai_query(&bot, msg, prompt).await?;
-        }
-    };
-
-    Ok(())
 }

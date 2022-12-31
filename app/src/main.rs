@@ -12,7 +12,7 @@ pub(crate) mod states;
 pub mod cli;
 pub mod services;
 
-use acme::prelude::AppSpec;
+use acme::prelude::{AppSpec, AsyncSpawable};
 use scsys::prelude::{AsyncResult, Locked, State};
 use std::{
     convert::From,
@@ -29,26 +29,22 @@ async fn main() -> AsyncResult {
     // Create an application instance
     let mut app = Application::default();
     // Quickstart the application runtime with the following command
-    app.start().await?;
+    app.spawn().await?;
 
     Ok(())
 }
 
 #[derive(Clone, Debug)]
 pub struct Application {
-    pub cnf: Settings,
     pub ctx: Context,
     pub interface: Vec<Interface>,
     pub state: Locked<State<States>>,
 }
 
 impl Application {
-    pub fn new(cnf: Settings, ctx: Context, state: Locked<State<States>>) -> Self {
-        cnf.logger().clone().setup(None);
-        tracing_subscriber::fmt::init();
-        tracing::info!("Application initialized; completing setup...");
+    pub fn new(ctx: Context, state: Locked<State<States>>) -> Self {
+        ctx.settings().logger().clone().setup(None);
         Self {
-            cnf,
             ctx,
             interface: Vec::new(),
             state,
@@ -79,11 +75,14 @@ impl Application {
             .await?;
         Ok(())
     }
-    /// AIO method for running the initialized application
-    pub async fn start(&mut self) -> AsyncResult<&Self> {
+}
+
+#[async_trait::async_trait]
+impl AsyncSpawable for Application {
+    async fn spawn(&mut self) -> AsyncResult<&Self> {
+        self.setup()?;
         tracing::info!("Startup: Application initializing...");
         self.runtime().await?;
-
         Ok(self)
     }
 }
@@ -104,15 +103,15 @@ impl AppSpec for Application {
     }
 
     fn name(&self) -> String {
-        self.cnf.clone().name
+        self.settings().clone().name
     }
 
     fn settings(&self) -> Self::Cnf {
-        self.cnf.clone()
+        self.ctx.settings().clone()
     }
 
     fn setup(&mut self) -> AsyncResult<&Self> {
-        self.cnf.logger.setup(None);
+        self.settings().logger.setup(None);
         tracing_subscriber::fmt::init();
         tracing::debug!("Application initialized; completing setup...");
         Ok(self)
@@ -131,13 +130,13 @@ impl Default for Application {
 
 impl From<Settings> for Application {
     fn from(data: Settings) -> Self {
-        Self::new(data.clone(), Context::from(data), Default::default())
+        Self::new(Context::from(data), Default::default())
     }
 }
 
 impl From<Context> for Application {
     fn from(data: Context) -> Self {
-        Self::new(data.clone().cnf, data, Default::default())
+        Self::new(data, Default::default())
     }
 }
 

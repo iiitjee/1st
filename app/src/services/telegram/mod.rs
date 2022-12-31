@@ -43,12 +43,6 @@ pub(crate) mod specs {
         fn bot(&self) -> Bot
         where
             Self: Sized;
-        fn name(&self) -> String
-        where
-            Self: Sized;
-        fn username(&self) -> String
-        where
-            Self: Sized;
         fn bot_from_env() -> Bot
         where
             Self: Sized,

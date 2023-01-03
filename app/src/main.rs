@@ -30,7 +30,7 @@ async fn main() -> AsyncResult {
     // Create an application instance
     let mut app = Application::default();
     // Quickstart the application runtime with the following command
-    app.start().await?;
+    app.spawn().await?;
 
     Ok(())
 }
@@ -86,7 +86,6 @@ impl AsyncSpawnable for Application {
     async fn spawn(&mut self) -> AsyncResult<&Self> {
         tracing::info!("Startup: Application initializing...");
         self.runtime().await?;
-
         Ok(self)
     }
 }
@@ -114,7 +113,7 @@ impl AppSpec<Settings> for Application {
     }
 
     fn setup(&mut self) -> AsyncResult<&Self> {
-        self.cnf.logger.setup(None);
+        self.settings().logger.setup(None);
         tracing_subscriber::fmt::init();
         tracing::debug!("Application initialized; completing setup...");
         Ok(self)

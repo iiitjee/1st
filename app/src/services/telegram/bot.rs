@@ -8,9 +8,8 @@ use crate::services::openai::{clean_choices, ChatGPT};
 use acme::prelude::AsyncSpawnable;
 use scsys::prelude::{AsyncResult, Configurable};
 use serde::{Deserialize, Serialize};
-use teloxide::dispatching::repls::CommandReplExt;
+
 use teloxide::prelude::*;
-use teloxide::utils::command::BotCommands;
 
 use std::sync::Arc;
 use tokio::task::JoinHandle;
@@ -60,34 +59,27 @@ impl TelegramBot {
     pub fn new(cnf: TelegramBotConfig) -> Self {
         Self { cnf }
     }
-    pub async fn handle(&self) -> JoinHandle<Arc<Self>> {
+    pub async fn handle(&mut self) -> JoinHandle<Arc<Self>> {
         let bot = Arc::new(self.clone());
-        tokio::spawn(async {
-            bot.spawn().await.expect("");
+        tokio::spawn(async move {
+            bot.start().await.expect("");
             bot
         })
     }
-    pub async fn spawn(&self) -> AsyncResult<&Self> {
+    async fn start(&self) -> AsyncResult<&Self> {
         Command::repl(self.bot(), handler).await;
         Ok(self)
     }
 }
 
+#[async_trait::async_trait]
+impl AsyncSpawable for TelegramBot {
+    async fn spawn(&mut self) -> AsyncResult<&Self> {
+        self.start().await
+    }
+}
+
 impl TelegramBotSpec for TelegramBot {
-    fn name(&self) -> String
-    where
-        Self: Sized,
-    {
-        self.cnf.name.clone()
-    }
-
-    fn username(&self) -> String
-    where
-        Self: Sized,
-    {
-        self.cnf.username.clone()
-    }
-
     fn bot(&self) -> Bot
     where
         Self: Sized,
@@ -103,7 +95,6 @@ impl Configurable for TelegramBot {
         &self.cnf
     }
 }
-
 #[async_trait::async_trait]
 impl AsyncSpawnable for TelegramBot {
     async fn spawn(&mut self) -> AsyncResult<&Self> {

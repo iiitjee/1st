@@ -1,11 +1,13 @@
 /*
-    Appellation: telegram <module>
+    Appellation: bot <telegram>
     Contrib: FL03 <j3mccain@gmail.com> (https://github.com/FL03)
     Description: ... Summary ...
 */
-pub use self::{bot::*, specs::*};
+pub use self::{bot::*, commands::*, settings::*, specs::*};
 
 pub(crate) mod bot;
+pub(crate) mod commands;
+pub(crate) mod settings;
 
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};
@@ -40,12 +42,6 @@ pub(crate) mod specs {
     ///
     pub trait TelegramBotSpec {
         fn bot(&self) -> Bot
-        where
-            Self: Sized;
-        fn name(&self) -> String
-        where
-            Self: Sized;
-        fn username(&self) -> String
         where
             Self: Sized;
         fn bot_from_env() -> Bot

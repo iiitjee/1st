@@ -3,12 +3,16 @@
     Contrib: FL03 <jo3mccain@icloud.com>
     Description: ... summary ...
 */
-use scsys::prelude::{fnl_remove, StatePack};
+use scsys::prelude::{fnl_remove, Locked, Message, StatePack};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use strum::{EnumString, EnumVariantNames};
 
+pub type State = scsys::prelude::State<States>;
+
+
 #[derive(
-    Clone, Debug, Deserialize, EnumString, EnumVariantNames, Eq, Hash, PartialEq, Serialize,
+    Clone, Copy, Debug, Deserialize, EnumString, EnumVariantNames, Eq, Hash, PartialEq, Serialize,
 )]
 #[strum(serialize_all = "snake_case")]
 pub enum States {
@@ -45,9 +49,47 @@ impl std::fmt::Display for States {
     }
 }
 
+impl Into<Locked<State>> for States {
+    
+}
+
 impl From<States> for i64 {
     fn from(val: States) -> Self {
         val as i64
+    }
+}
+
+
+impl From<i64> for States {
+    fn from(data: i64) -> Self {
+        match data {
+            0 => Self::Error,
+            1 => Self::Idle,
+            2 => Self::Complete,
+            3 => Self::Derive,
+            4 => Self::Process,
+            5 => Self::Request,
+            6 => Self::Response,
+            _ => Self::Error,
+        }
+    }
+}
+
+impl TryInto<Value> for States {
+    type Error = Box<dyn std::error::Error + Send + Sync>;
+
+    fn try_into(self) -> Result<Value, <States as TryInto<Value>>::Error> {
+        let res = serde_json::to_value(State::new(None, None, Some(self)))?;
+        Ok(res)
+    }
+}
+
+impl TryInto<Message> for States {
+    type Error = Box<dyn std::error::Error + Send + Sync>;
+
+    fn try_into(self) -> Result<Message, <States as TryInto<Message>>::Error> {
+        let res: Value = self.try_into()?;
+        Ok(Message::from(res))
     }
 }
 

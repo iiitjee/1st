@@ -5,6 +5,7 @@
 */
 use crate::services::telegram::{TelegramBot, TelegramBotConfig};
 
+use acme::prelude::AsyncSpawable;
 use clap::Args;
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};

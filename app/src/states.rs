@@ -10,7 +10,6 @@ use strum::{EnumString, EnumVariantNames};
 
 pub type State = scsys::prelude::State<States>;
 
-
 #[derive(
     Clone, Copy, Debug, Deserialize, EnumString, EnumVariantNames, Eq, Hash, PartialEq, Serialize,
 )]
@@ -49,8 +48,16 @@ impl std::fmt::Display for States {
     }
 }
 
+impl Into<Locked<States>> for States {
+    fn into(self) -> Locked<States> {
+        std::sync::Arc::new(std::sync::Mutex::new(self))
+    }
+}
+
 impl Into<Locked<State>> for States {
-    
+    fn into(self) -> Locked<State> {
+        std::sync::Arc::new(std::sync::Mutex::new(State::new(None, None, Some(self))))
+    }
 }
 
 impl From<States> for i64 {
@@ -58,7 +65,6 @@ impl From<States> for i64 {
         val as i64
     }
 }
-
 
 impl From<i64> for States {
     fn from(data: i64) -> Self {

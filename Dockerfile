@@ -38,7 +38,6 @@ FROM builder-base as runner
 
 ENV OPENAI_API_KEY=""\
     RUST_LOG="info" \
-    SERVER_PORT=8080 \
     TELOXIDE_TOKEN=""
 
 COPY --chown=55 .config /config

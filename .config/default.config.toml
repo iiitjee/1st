@@ -1,13 +1,3 @@
-mode = "staging"
-name = "tldr"
 
-[bot]
 name = "Puzzled"
-username = "pzzldbot"
-
-[logger]
-level = "info"
-
-[server]
-host = "127.0.0.1"
-port = 8080
+username = "@pzzldbot"

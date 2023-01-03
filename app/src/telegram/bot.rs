@@ -37,13 +37,6 @@ impl TelegramBot {
     }
 }
 
-#[async_trait::async_trait]
-impl AsyncSpawnable for TelegramBot {
-    async fn spawn(&mut self) -> AsyncResult<&Self> {
-        self.start().await
-    }
-}
-
 impl TelegramBotSpec for TelegramBot {
     fn bot(&self) -> Bot
     where
@@ -54,7 +47,7 @@ impl TelegramBotSpec for TelegramBot {
 }
 
 impl Configurable for TelegramBot {
-    type Settings = Self;
+    type Settings = TelegramBotConfig;
 
     fn settings(&self) -> &Self::Settings {
         &self.cnf
@@ -62,6 +55,7 @@ impl Configurable for TelegramBot {
 }
 
 impl Contextual for TelegramBot {
+    type Cnf = TelegramBotConfig;
     type Ctx = Self;
 
     fn context(&self) -> &Self::Ctx {
@@ -74,5 +68,11 @@ impl AsyncSpawnable for TelegramBot {
     async fn spawn(&mut self) -> AsyncResult<&Self> {
         Command::repl(self.bot(), handler).await;
         Ok(self)
+    }
+}
+
+impl std::fmt::Display for TelegramBot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(&self).unwrap())
     }
 }

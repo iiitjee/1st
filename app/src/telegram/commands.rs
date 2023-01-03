@@ -3,11 +3,10 @@
     Contrib: FL03 <j3mccain@gmail.com> (https://github.com/FL03)
     Description: ... Summary ...
 */
-use crate::services::openai::{clean_choices, ChatGPT};
+use crate::openai::{clean_choices, ChatGPT};
 
-use teloxide::prelude::{Bot, Message, ResponseResult, Requester};
+use teloxide::prelude::{Bot, Message, Requester, ResponseResult};
 use teloxide::utils::command::BotCommands;
-
 
 /// Defines the desired command structure for the [TelegramBot]
 #[derive(BotCommands, Clone, Debug, PartialEq)]

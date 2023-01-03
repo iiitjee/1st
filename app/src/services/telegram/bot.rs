@@ -5,7 +5,7 @@
 */
 use super::{TelegramBotSpec, DEFAULT_ENV_KEY};
 use crate::services::openai::{clean_choices, ChatGPT};
-
+use acme::prelude::AsyncSpawnable;
 use scsys::prelude::{AsyncResult, Configurable};
 use serde::{Deserialize, Serialize};
 use teloxide::dispatching::repls::CommandReplExt;
@@ -104,13 +104,13 @@ impl Configurable for TelegramBot {
     }
 }
 
-// #[async_trait::async_trait]
-// impl AsyncSpawable for TelegramBot {
-//     async fn spawn(&mut self) -> AsyncResult<&Self> {
-//         Command::repl(self.bot(), handler).await;
-//         Ok(self)
-//     }
-// }
+#[async_trait::async_trait]
+impl AsyncSpawnable for TelegramBot {
+    async fn spawn(&mut self) -> AsyncResult<&Self> {
+        Command::repl(self.bot(), handler).await;
+        Ok(self)
+    }
+}
 
 /// Defines the desired command structure for the [TelegramBot]
 #[derive(BotCommands, Clone, Debug, PartialEq)]

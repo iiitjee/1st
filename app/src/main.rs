@@ -12,7 +12,8 @@ pub(crate) mod states;
 pub mod cli;
 pub mod services;
 
-use acme::prelude::AppSpec;
+use acme::prelude::{AppSpec, AsyncSpawnable};
+use async_trait::async_trait;
 use scsys::prelude::{AsyncResult, Locked, State};
 use std::{
     convert::From,
@@ -36,21 +37,20 @@ async fn main() -> AsyncResult {
 
 #[derive(Clone, Debug)]
 pub struct Application {
-    pub cnf: Settings,
     pub ctx: Context,
-    pub interface: Vec<Interface>,
     pub state: Locked<State<States>>,
 }
 
 impl Application {
-    pub fn new(cnf: Settings, ctx: Context, state: Locked<State<States>>) -> Self {
+    pub fn new(cnf: Settings) -> Self {
         cnf.logger().clone().setup(None);
         tracing_subscriber::fmt::init();
         tracing::info!("Application initialized; completing setup...");
+        let ctx = Context::from(cnf);
+        let state = Arc::new(Mutex::new(Default::default()));
+
         Self {
-            cnf,
             ctx,
-            interface: Vec::new(),
             state,
         }
     }
@@ -79,8 +79,11 @@ impl Application {
             .await?;
         Ok(())
     }
-    /// AIO method for running the initialized application
-    pub async fn start(&mut self) -> AsyncResult<&Self> {
+}
+
+#[async_trait]
+impl AsyncSpawnable for Application {
+    async fn spawn(&mut self) -> AsyncResult<&Self> {
         tracing::info!("Startup: Application initializing...");
         self.runtime().await?;
 
@@ -88,8 +91,7 @@ impl Application {
     }
 }
 
-impl AppSpec for Application {
-    type Cnf = Settings;
+impl AppSpec<Settings> for Application {
 
     type Ctx = Context;
 
@@ -104,11 +106,11 @@ impl AppSpec for Application {
     }
 
     fn name(&self) -> String {
-        self.cnf.clone().name
+        env!("CARGO_PKG_NAME").to_string()
     }
 
-    fn settings(&self) -> Self::Cnf {
-        self.cnf.clone()
+    fn settings(&self) -> Settings {
+        self.context().cnf.clone()
     }
 
     fn setup(&mut self) -> AsyncResult<&Self> {
@@ -131,29 +133,23 @@ impl Default for Application {
 
 impl From<Settings> for Application {
     fn from(data: Settings) -> Self {
-        Self::new(data.clone(), Context::from(data), Default::default())
+        Self::from(Context::from(cnf))
     }
 }
 
 impl From<Context> for Application {
-    fn from(data: Context) -> Self {
-        Self::new(data.clone().cnf, data, Default::default())
+    fn from(ctx: Context) -> Self {
+        let state = Arc::new(Mutex::new(Default::default()));
+
+        Self {
+            ctx,
+            state,
+        }
     }
 }
 
 impl std::fmt::Display for Application {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", serde_json::to_string(&self.ctx).unwrap())
-    }
-}
-
-#[derive(Clone, Debug)]
-pub enum Interface {
-    Cli(cli::CommandLineInterface),
-}
-
-impl Default for Interface {
-    fn default() -> Self {
-        Self::Cli(Default::default())
     }
 }

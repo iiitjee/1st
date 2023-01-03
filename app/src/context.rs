@@ -4,11 +4,9 @@
     Description: ... summary ...
 */
 use crate::Settings;
+use scsys::prelude::{project_root, Contextual};
 use serde::{Deserialize, Serialize};
-use std::{
-    convert::From,
-    path::{Path, PathBuf},
-};
+use std::path::PathBuf;
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Context {
@@ -34,6 +32,14 @@ impl Context {
     }
 }
 
+impl Contextual for Context {
+    type Ctx = Self;
+
+    fn context(&self) -> &Self::Ctx {
+        &self
+    }
+}
+
 impl From<Settings> for Context {
     fn from(data: Settings) -> Self {
         Self {
@@ -47,12 +53,4 @@ impl std::fmt::Display for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", serde_json::to_string(self).unwrap())
     }
-}
-
-fn project_root() -> PathBuf {
-    Path::new(&env!("CARGO_MANIFEST_DIR"))
-        .ancestors()
-        .nth(1)
-        .unwrap()
-        .to_path_buf()
 }

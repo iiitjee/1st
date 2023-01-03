@@ -16,21 +16,16 @@ pub enum Services {
 pub struct Settings {
     pub logger: Logger,
     pub mode: String,
-    pub name: String,
     pub server: Server,
 }
 
 impl Settings {
-    pub fn new(mode: Option<String>, name: Option<String>) -> Self {
-        let (mode, name) = (
-            mode.unwrap_or_else(|| String::from("production")),
-            name.unwrap_or_else(|| String::from("tldr")),
-        );
+    pub fn new(mode: Option<String>) -> Self {
+        let mode = mode.unwrap_or_else(|| String::from("production"));
         let (logger, server) = (Default::default(), Default::default());
         Self {
             logger,
             mode,
-            name,
             server,
         }
     }
@@ -38,7 +33,6 @@ impl Settings {
         let mut builder = Config::builder()
             .add_source(Environment::default().separator("__"))
             .set_default("mode", "production")?
-            .set_default("name", "conduit")?
             .set_default("logger.level", "info")?
             .set_default("server.host", "127.0.0.1")?
             .set_default("server.port", 8080)?;
@@ -74,7 +68,7 @@ impl Configurable for Settings {
 
 impl Default for Settings {
     fn default() -> Self {
-        let d = Self::new(None, None);
+        let d = Self::new(None);
         Self::build().unwrap_or(d)
     }
 }

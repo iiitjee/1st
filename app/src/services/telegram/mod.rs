@@ -3,10 +3,11 @@
     Contrib: FL03 <j3mccain@gmail.com> (https://github.com/FL03)
     Description: ... Summary ...
 */
-pub use self::{bot::*, commands::*, specs::*};
+pub use self::{bot::*, commands::*, settings::*, specs::*};
 
 pub(crate) mod bot;
 pub(crate) mod commands;
+pub(crate) mod settings;
 
 use scsys::AsyncResult;
 use serde::{Deserialize, Serialize};

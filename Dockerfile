@@ -10,9 +10,7 @@ RUN apt-get install -y \
     pkg-config \
     protobuf-compiler
 
-RUN rustup update && \
-    rustup install nightly && \
-    rustup target add wasm32-unknown-unknown wasm32-wasi
+RUN rustup update
 
 FROM builder-base as builder
 
@@ -44,8 +42,6 @@ COPY --chown=55 .config /config
 VOLUME [ "/config" ]
 
 COPY --from=builder /workspace/target/release/pzzldbot /bin/pzzldbot
-
-EXPOSE 6379
 
 FROM runner
 

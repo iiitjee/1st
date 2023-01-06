@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
-rustup install nightly
-rustup component add clippy rustfmt --toolchain nightly
-rustup target add wasm32-unknown-unknown --toolchain nightly
+nix flake update
+nix shell -c cargo build --workspace

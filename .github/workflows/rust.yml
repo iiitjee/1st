@@ -27,7 +27,7 @@ jobs:
           - stable
           - nightly
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: setup langspace
         run: rustup default ${{ matrix.toolchain }}
       - run: cargo build --workspace
@@ -42,6 +42,6 @@ jobs:
         package:
           - tldr
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Publish (${{matrix.package}})
         run: cargo publish --all-features -v -p ${{ matrix.package }} --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
